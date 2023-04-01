@@ -46,11 +46,14 @@ export class UserRepository {
   }
 
   async updateUser(
-    userId: Prisma.UserWhereUniqueInput,
+    input: Prisma.UserWhereUniqueInput,
     user: Prisma.UserUncheckedUpdateInput,
   ) {
     try {
-      const updated = await prisma.user.update({ data: user, where: userId });
+      const updated = await prisma.user.update({
+        data: user,
+        where: { userId: +input.userId },
+      });
       return updated;
     } catch (error) {
       console.log(`repository: update by user id failed ${error.message}`);
