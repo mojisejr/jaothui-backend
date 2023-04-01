@@ -5,7 +5,7 @@ import { ErrorResponse, OkResponse } from 'src/utils/parseResponseData';
 import { CreateQuestDTO, UpdateQuestDTO } from './dto/quest.dto';
 import { QuestService } from './quest.service';
 
-@Controller('quest')
+@Controller('quests')
 export class QuestController {
   constructor(private questService: QuestService) {}
 

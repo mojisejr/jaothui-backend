@@ -1,10 +1,12 @@
-export interface CreateTaskDTO {
+export interface CreateNewTaskDTO {
   userId: number;
   questId: number;
-  pointEared: number;
+  pointEarned: number;
+  completed: boolean;
 }
 
 export interface UpdateTaskDTO {
-  pointEared: number;
+  pointEarned: number;
   completedDate: Date;
+  completed: boolean;
 }

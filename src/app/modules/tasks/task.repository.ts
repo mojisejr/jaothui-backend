@@ -46,7 +46,20 @@ export class TaskRepository {
       const tasks = await prisma.dailyTask.findMany();
       return tasks;
     } catch (error) {
-      console.log(`repository: cannot find tasks`);
+      console.log(`repository: cannot find tasks ${error.message}`);
+    }
+  }
+
+  async findAllTasksByUserId(
+    input: Prisma.DailyTaskWhereInput,
+  ): Promise<DailyTask[]> {
+    try {
+      const tasks = await prisma.dailyTask.findMany({
+        where: { userId: +input.userId },
+      });
+      return tasks;
+    } catch (error) {
+      console.log(`repository: cannot find tasks ${error.message}`);
     }
   }
 
