@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Body, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Query,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ResponseData } from 'src/shared/shared.interface';
 import { hasData } from 'src/utils/checkNullorUndefind';
 import { ErrorResponse, OkResponse } from 'src/utils/parseResponseData';
@@ -19,7 +28,7 @@ export class QuestController {
 
   @Get(':questId')
   async findQuestById(
-    @Param('questId') questId: number,
+    @Param('questId', ParseIntPipe) questId: number,
   ): Promise<ResponseData> {
     const quest = await this.questService.findQuestById(questId);
     return !hasData(quest)
@@ -37,7 +46,7 @@ export class QuestController {
 
   @Put(':questId')
   async updateQuestById(
-    @Param('questId') questId: number,
+    @Param('questId', ParseIntPipe) questId: number,
     @Body() data: UpdateQuestDTO,
   ) {
     const updated = await this.questService.updateQuestById(questId, data);
@@ -47,7 +56,7 @@ export class QuestController {
   }
 
   @Put('delete/:questId')
-  async deleteQuestById(@Param('questId') questId: number) {
+  async deleteQuestById(@Param('questId', ParseIntPipe) questId: number) {
     const deleted = await this.questService.deleteQuestById(questId);
     return !hasData(deleted)
       ? ErrorResponse(deleted, `deleting questId ${questId} failed`)

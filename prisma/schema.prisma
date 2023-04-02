@@ -41,8 +41,8 @@ model DailyTask {
   pointEarned    Int?
   completed      Boolean
   completed_date DateTime?
-  quest          Quest     @relation(fields: [questId], references: [questId])
   user           User      @relation(fields: [userId], references: [userId])
+  quest          Quest     @relation(fields: [questId], references: [questId])
 }
 
 model Leaderboard {
@@ -67,8 +67,8 @@ model RedemptionLog {
   address  String?
   received Boolean?       @default(false)
   redeemAt DateTime?      @default(now())
-  item     RedemptionItem @relation(fields: [itemId], references: [itemId])
   user     User           @relation(fields: [userId], references: [userId])
+  item     RedemptionItem @relation(fields: [itemId], references: [itemId])
 }
 
 model RedemptionItem {

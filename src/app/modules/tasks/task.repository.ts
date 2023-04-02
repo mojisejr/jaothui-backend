@@ -20,7 +20,7 @@ export class TaskRepository {
   ): Promise<DailyTask> {
     try {
       const task = await prisma.dailyTask.findUnique({
-        where: { taskId: +input.taskId },
+        where: { taskId: input.taskId },
       });
       return task;
     } catch (error) {
@@ -33,7 +33,7 @@ export class TaskRepository {
   ): Promise<DailyTask[]> {
     try {
       const tasks = await prisma.dailyTask.findMany({
-        where: { userId: +input.userId },
+        where: { userId: input.userId },
       });
       return tasks;
     } catch (error) {
@@ -55,7 +55,7 @@ export class TaskRepository {
   ): Promise<DailyTask[]> {
     try {
       const tasks = await prisma.dailyTask.findMany({
-        where: { userId: +input.userId },
+        where: { userId: input.userId },
       });
       return tasks;
     } catch (error) {
@@ -70,7 +70,7 @@ export class TaskRepository {
     try {
       const updated = await prisma.dailyTask.updateMany({
         data,
-        where: { userId: +input.userId, taskId: +input.taskId },
+        where: { userId: input.userId, taskId: input.taskId },
       });
       return updated;
     } catch (error) {
@@ -81,7 +81,7 @@ export class TaskRepository {
   async deleteTaskByUserId(input: Prisma.DailyTaskWhereInput) {
     try {
       const deleted = await prisma.dailyTask.deleteMany({
-        where: { userId: +input.userId, taskId: +input.taskId },
+        where: { userId: input.userId, taskId: input.taskId },
       });
       return deleted;
     } catch (error) {

@@ -1,3 +1,4 @@
+import { BadRequestException } from '@nestjs/common';
 import { ResponseData } from 'src/shared/shared.interface';
 
 export function ErrorResponse(
@@ -5,12 +6,13 @@ export function ErrorResponse(
   message: string,
   statusCode: string | number = 400,
 ): ResponseData {
-  return {
-    status: false,
-    statusCode,
-    message,
-    data: data,
-  };
+  throw new BadRequestException(message);
+  // return {
+  //   status: false,
+  //   statusCode,
+  //   message,
+  //   data: data,
+  // };
 }
 
 export function OkResponse(

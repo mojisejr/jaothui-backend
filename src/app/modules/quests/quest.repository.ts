@@ -40,7 +40,7 @@ export class QuestRepository {
     try {
       const result = await prisma.quest.update({
         data,
-        where: { questId: +input.questId },
+        where: { questId: input.questId },
       });
       return result;
     } catch (error) {
@@ -53,7 +53,7 @@ export class QuestRepository {
   async deleteQuestById(input: Prisma.QuestWhereUniqueInput) {
     try {
       const result = await prisma.quest.delete({
-        where: { questId: +input.questId },
+        where: { questId: input.questId },
       });
       return result;
     } catch (error) {

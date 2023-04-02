@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Put, Body, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Query,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { TaskService } from './task.service';
 import { hasData } from 'src/utils/checkNullorUndefind';
 import { ErrorResponse, OkResponse } from 'src/utils/parseResponseData';
@@ -45,7 +54,9 @@ export class TaskController {
   }
 
   @Get(':taskId')
-  async findTaskById(@Param('taskId') taskId: number): Promise<ResponseData> {
+  async findTaskById(
+    @Param('taskId', ParseIntPipe) taskId: number,
+  ): Promise<ResponseData> {
     const task = await this.taskService.findTaskById(taskId);
     return !hasData(task)
       ? ErrorResponse(task, `find taskId ${taskId} failed`)
@@ -54,7 +65,7 @@ export class TaskController {
 
   @Get('/user/:userId')
   async findAllTaskByUserId(
-    @Param('userId') userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
   ): Promise<ResponseData> {
     const tasks = await this.taskService.findAllTasksByUserId(userId);
     return !hasData(tasks)
@@ -64,8 +75,8 @@ export class TaskController {
 
   @Put('/user/:userId/:taskId')
   async updateTaskByUserId(
-    @Param('userId') userId: number,
-    @Param('taskId') taskId: number,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Param('taskId', ParseIntPipe) taskId: number,
     @Body() task: UpdateTaskDTO,
   ) {
     const updated = await this.taskService.updateTaskByUserId(

@@ -1,9 +1,21 @@
-import { Controller, Get, Post, Put, Body, Query, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Body,
+  Query,
+  Param,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CreateUserDTO, UpdateUserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 import { ResponseData } from 'src/shared/shared.interface';
 import { hasData } from 'src/utils/checkNullorUndefind';
 import { ErrorResponse, OkResponse } from 'src/utils/parseResponseData';
+import { CreateUserBodyValidationPipe } from './pipes/user.create.pipes';
+import { UpdateUserBodyValidationPipe } from './pipes/user.update.pipes';
+import { EthAddressValidationPipe } from 'src/shared/pipes/address.validation';
 
 @Controller('users')
 export class UserController {
@@ -13,33 +25,33 @@ export class UserController {
   async findAllUsers(): Promise<ResponseData> {
     const users = await this.userService.findAllUsers();
 
-    return !hasData(users)
-      ? ErrorResponse(users, 'find all uses failed')
-      : OkResponse(users, 'find all users sucessfully');
+    return OkResponse(users, 'find all users sucessfully');
   }
 
   @Get('check')
-  async isRegistered(@Query('wallet') wallet: string): Promise<ResponseData> {
+  async isRegistered(
+    @Query('wallet', EthAddressValidationPipe) wallet: string,
+  ): Promise<ResponseData> {
     const result = await this.userService.checkCreatedByWallet(wallet);
 
-    return !hasData(result)
-      ? ErrorResponse(result, 'cannot check user registeration status')
+    return !result
+      ? ErrorResponse(result, 'not registered.')
       : OkResponse(result, 'sucessfully');
   }
 
   @Get(':userId')
-  async findUserById(@Param('userId') userId: number): Promise<ResponseData> {
+  async findUserById(
+    @Param('userId', ParseIntPipe) userId: number,
+  ): Promise<ResponseData> {
     const user = await this.userService.findUserById(userId);
 
-    return !hasData(user)
-      ? ErrorResponse(user, `cannot get information of userId: ${userId}`)
-      : OkResponse(user, `get information of userId: ${userId}`);
+    return OkResponse(user, `get information of userId: ${userId}`);
   }
 
   @Put(':userId')
   async updateUserById(
-    @Param('userId') userId: number,
-    @Body() updateData: UpdateUserDTO,
+    @Param('userId', ParseIntPipe) userId: number,
+    @Body(UpdateUserBodyValidationPipe) updateData: UpdateUserDTO,
   ) {
     const updated = await this.userService.updateUser(userId, updateData);
 
@@ -49,11 +61,11 @@ export class UserController {
   }
 
   @Post()
-  async createNewUser(@Body() user: CreateUserDTO): Promise<ResponseData> {
+  async createNewUser(
+    @Body(CreateUserBodyValidationPipe) user: CreateUserDTO,
+  ): Promise<ResponseData> {
     const created = await this.userService.createNewUser(user);
 
-    return !hasData(created)
-      ? ErrorResponse(created, `user created failed`)
-      : OkResponse(created, `user created succesfully`);
+    return OkResponse(created, `user created succesfully`, 201);
   }
 }
