@@ -57,17 +57,50 @@ export class UserService {
   }
 
   async findUserBywallet(wallet: string) {
-    const result = await this.userRepo.findUserByWallet(wallet);
-    return result;
+    try {
+      const result = await this.userRepo.findUserByWallet(wallet);
+      if (!hasData(result)) {
+        throw new NotFoundException(
+          `findUserByWallet: wallet ${wallet} not found`,
+          { cause: new Error() },
+        );
+      }
+      return result;
+    } catch (error) {
+      throw new BadRequestException(
+        `findUserBywallet: find user by wallet error`,
+        { cause: new Error() },
+      );
+    }
   }
 
   async updateUser(userId: number, user: UpdateUserDTO) {
-    const result = await this.userRepo.updateUser({ userId }, user);
-    return result;
+    try {
+      const result = await this.userRepo.updateUser({ userId }, user);
+      if (!hasData(result)) {
+        throw new BadRequestException(
+          `updateUser: cannot update user data of ${userId}`,
+          { cause: new Error() },
+        );
+      }
+      return result;
+    } catch (error) {
+      throw new BadRequestException(
+        `updateUser: update user data of ${userId} failed`,
+        { cause: new Error() },
+      );
+    }
   }
 
   async checkCreatedByWallet(wallet: string) {
-    const result = await this.userRepo.checkCreatedByWallet(wallet);
-    return result;
+    try {
+      const result = await this.userRepo.checkCreatedByWallet(wallet);
+      return result;
+    } catch (error) {
+      throw new BadRequestException(
+        `checkCreatedByWallet: cannot check this wallet address ${wallet}`,
+        { cause: new Error() },
+      );
+    }
   }
 }

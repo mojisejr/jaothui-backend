@@ -11,8 +11,7 @@ import {
 import { CreateUserDTO, UpdateUserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 import { ResponseData } from 'src/shared/shared.interface';
-import { hasData } from 'src/utils/checkNullorUndefind';
-import { ErrorResponse, OkResponse } from 'src/utils/parseResponseData';
+import { OkResponse } from 'src/utils/parseResponseData';
 import { CreateUserBodyValidationPipe } from './pipes/user.create.pipes';
 import { UpdateUserBodyValidationPipe } from './pipes/user.update.pipes';
 import { EthAddressValidationPipe } from 'src/shared/pipes/address.validation';
@@ -34,9 +33,7 @@ export class UserController {
   ): Promise<ResponseData> {
     const result = await this.userService.checkCreatedByWallet(wallet);
 
-    return !result
-      ? ErrorResponse(result, 'not registered.')
-      : OkResponse(result, 'sucessfully');
+    return OkResponse(result, 'sucessfully');
   }
 
   @Get(':userId')
@@ -48,6 +45,15 @@ export class UserController {
     return OkResponse(user, `get information of userId: ${userId}`);
   }
 
+  @Get('/wallet/:wallet')
+  async findUserByWallet(
+    @Param('wallet', EthAddressValidationPipe) wallet: string,
+  ): Promise<ResponseData> {
+    const user = await this.userService.findUserBywallet(wallet);
+
+    return OkResponse(user, `get user by wallet ${wallet} successfully`);
+  }
+
   @Put(':userId')
   async updateUserById(
     @Param('userId', ParseIntPipe) userId: number,
@@ -55,9 +61,7 @@ export class UserController {
   ) {
     const updated = await this.userService.updateUser(userId, updateData);
 
-    return !hasData(updated)
-      ? ErrorResponse(updated, `updated data failed userId: ${userId}`)
-      : OkResponse(updated, `updated data succesfully userId: ${userId}`);
+    return OkResponse(updated, `updated data succesfully userId: ${userId}`);
   }
 
   @Post()
