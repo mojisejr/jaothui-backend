@@ -1,19 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
 import { ResponseData } from 'src/shared/shared.interface';
-
-export function ErrorResponse(
-  data: any,
-  message: string,
-  statusCode: string | number = 400,
-): ResponseData {
-  throw new BadRequestException(message);
-  // return {
-  //   status: false,
-  //   statusCode,
-  //   message,
-  //   data: data,
-  // };
-}
 
 export function OkResponse(
   data: any,

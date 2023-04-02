@@ -4,17 +4,22 @@ import {
   Post,
   Put,
   Body,
-  Query,
   Param,
+  Query,
   ParseIntPipe,
+  NotFoundException,
+  ParseBoolPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { hasData } from 'src/utils/checkNullorUndefind';
-import { ErrorResponse, OkResponse } from 'src/utils/parseResponseData';
+import { OkResponse } from 'src/utils/parseResponseData';
 import { CreateNewTaskDTO, UpdateTaskDTO } from './dto/task.dto';
 import { ResponseData } from 'src/shared/shared.interface';
 import { UserService } from '../users/user.service';
 import { QuestService } from '../quests/quest.service';
+import { CreateTaskBodyValidationPipe } from './pipes/task.create.pipe';
+import { UpdateTaskBodyValidationPipe } from './pipes/task.update.pipe';
 
 @Controller('tasks')
 export class TaskController {
@@ -25,32 +30,50 @@ export class TaskController {
   ) {}
 
   @Post()
-  async createNewTask(@Body() task: CreateNewTaskDTO): Promise<ResponseData> {
+  async createNewTask(
+    @Body(CreateTaskBodyValidationPipe) task: CreateNewTaskDTO,
+  ): Promise<ResponseData> {
     const user = await this.userService.findUserById(task.userId);
     const quest = await this.questService.findQuestById(task.questId);
     const hasUser = hasData(user);
     const hasQuest = hasData(quest);
     if (hasUser && hasQuest) {
       const result = await this.taskService.createNewTask(task);
-      return !hasData(result)
-        ? ErrorResponse(result, `create new task failed`)
-        : OkResponse(result, `create new task successfully`);
+      return OkResponse(result, `create new task successfully`);
     } else if (!hasUser) {
-      return ErrorResponse(
-        null,
-        `cannot create new task for un-registered user`,
+      throw new NotFoundException(
+        `taskId ${task.userId} not found cannot create task`,
+        { cause: new Error() },
       );
     } else if (!hasQuest) {
-      return ErrorResponse(null, `cannot create new task for the has no quest`);
+      throw new NotFoundException(
+        `questId ${task.questId} not found cannot create task`,
+        { cause: new Error() },
+      );
     }
   }
 
   @Get()
-  async findAllTasks(): Promise<ResponseData> {
-    const tasks = await this.taskService.findAllTasks();
-    return !hasData(tasks)
-      ? ErrorResponse(tasks, `find all tasks failed`)
-      : OkResponse(tasks, `find all tasks successfully`);
+  async findAllTasks(
+    @Query('completed', ParseBoolPipe) completed: boolean,
+  ): Promise<ResponseData> {
+    if (completed) {
+      const tasks = await this.taskService.findAllCompletedTasks();
+
+      if (!hasData(tasks)) {
+        throw new NotFoundException(`findAllTasks: completed tasks not found`);
+      }
+
+      return OkResponse(tasks, `find all tasks successfully`);
+    } else {
+      const tasks = await this.taskService.findAllTasks();
+
+      if (!hasData(tasks)) {
+        throw new NotFoundException(`findAllTasks: tasks not found`);
+      }
+
+      return OkResponse(tasks, `find all tasks successfully`);
+    }
   }
 
   @Get(':taskId')
@@ -58,9 +81,27 @@ export class TaskController {
     @Param('taskId', ParseIntPipe) taskId: number,
   ): Promise<ResponseData> {
     const task = await this.taskService.findTaskById(taskId);
-    return !hasData(task)
-      ? ErrorResponse(task, `find taskId ${taskId} failed`)
-      : OkResponse(task, `found taskId ${taskId}`);
+
+    if (!hasData(task)) {
+      throw new NotFoundException(`findTaskById: taskId ${taskId} not found`);
+    }
+
+    return OkResponse(task, `found taskId ${taskId}`);
+  }
+
+  @Get('user/:userId')
+  async findAllTasksByUserId(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query('completed', ParseBoolPipe) completed: boolean,
+  ) {
+    if (completed) {
+      const users = await this.taskService.findAllCompletedTaskByUserId(userId);
+      return OkResponse(users, `all completed by userId ${userId}`);
+    } else {
+      throw new BadRequestException(
+        `findAllTasksByUserId: need completed flag`,
+      );
+    }
   }
 
   @Get('/user/:userId')
@@ -68,16 +109,20 @@ export class TaskController {
     @Param('userId', ParseIntPipe) userId: number,
   ): Promise<ResponseData> {
     const tasks = await this.taskService.findAllTasksByUserId(userId);
-    return !hasData(tasks)
-      ? ErrorResponse(tasks, `find all task of userId ${userId} failed`)
-      : OkResponse(tasks, `find all tasks of userId ${userId} successfully`);
+
+    if (!hasData(tasks)) {
+      throw new NotFoundException(
+        `findAllTaskByUserId: tasks of userId ${userId} not found`,
+      );
+    }
+    return OkResponse(tasks, `find all tasks of userId ${userId} successfully`);
   }
 
   @Put('/user/:userId/:taskId')
   async updateTaskByUserId(
     @Param('userId', ParseIntPipe) userId: number,
     @Param('taskId', ParseIntPipe) taskId: number,
-    @Body() task: UpdateTaskDTO,
+    @Body(UpdateTaskBodyValidationPipe) task: UpdateTaskDTO,
   ) {
     const updated = await this.taskService.updateTaskByUserId(
       userId,
@@ -85,14 +130,9 @@ export class TaskController {
       task,
     );
 
-    return !hasData(updated)
-      ? ErrorResponse(
-          updated,
-          `cannot update taskId ${taskId} for userId ${userId}`,
-        )
-      : OkResponse(
-          updated,
-          `update taskId ${taskId} for userId ${userId} successfully`,
-        );
+    return OkResponse(
+      updated,
+      `update taskId ${taskId} for userId ${userId} successfully`,
+    );
   }
 }

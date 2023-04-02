@@ -7,24 +7,43 @@ import {
   Query,
   Param,
   ParseIntPipe,
+  NotFoundException,
+  ParseBoolPipe,
 } from '@nestjs/common';
 import { CreateUserDTO, UpdateUserDTO } from './dto/user.dto';
 import { UserService } from './user.service';
 import { ResponseData } from 'src/shared/shared.interface';
 import { OkResponse } from 'src/utils/parseResponseData';
-import { CreateUserBodyValidationPipe } from './pipes/user.create.pipes';
-import { UpdateUserBodyValidationPipe } from './pipes/user.update.pipes';
+import { CreateUserBodyValidationPipe } from './pipes/user.create.pipe';
+import { UpdateUserBodyValidationPipe } from './pipes/user.update.pipe';
 import { EthAddressValidationPipe } from 'src/shared/pipes/address.validation';
+import { hasData } from 'src/utils/checkNullorUndefind';
 
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Get()
-  async findAllUsers(): Promise<ResponseData> {
-    const users = await this.userService.findAllUsers();
+  async findAllUsers(
+    @Query('tasks', ParseBoolPipe) task: boolean,
+  ): Promise<ResponseData> {
+    if (task) {
+      const users = await this.userService.findAllUsersWithTasks();
 
-    return OkResponse(users, 'find all users sucessfully');
+      if (!hasData(users)) {
+        throw new NotFoundException(`findAllUsers: not found`);
+      }
+
+      return OkResponse(users, 'find all users sucessfully');
+    } else {
+      const users = await this.userService.findAllUsers();
+
+      if (!hasData) {
+        throw new NotFoundException(`findAllUsers: not found`);
+      }
+
+      return OkResponse(users, 'find all users sucessfully');
+    }
   }
 
   @Get('check')
@@ -32,8 +51,7 @@ export class UserController {
     @Query('wallet', EthAddressValidationPipe) wallet: string,
   ): Promise<ResponseData> {
     const result = await this.userService.checkCreatedByWallet(wallet);
-
-    return OkResponse(result, 'sucessfully');
+    return OkResponse(result, `found ${wallet}`);
   }
 
   @Get(':userId')
@@ -41,6 +59,10 @@ export class UserController {
     @Param('userId', ParseIntPipe) userId: number,
   ): Promise<ResponseData> {
     const user = await this.userService.findUserById(userId);
+
+    if (!hasData(user)) {
+      throw new NotFoundException(`findUserById: ${userId} not found`);
+    }
 
     return OkResponse(user, `get information of userId: ${userId}`);
   }
@@ -50,6 +72,10 @@ export class UserController {
     @Param('wallet', EthAddressValidationPipe) wallet: string,
   ): Promise<ResponseData> {
     const user = await this.userService.findUserBywallet(wallet);
+
+    if (!hasData(user)) {
+      throw new NotFoundException(`findUserByWallet: ${wallet} not found`);
+    }
 
     return OkResponse(user, `get user by wallet ${wallet} successfully`);
   }

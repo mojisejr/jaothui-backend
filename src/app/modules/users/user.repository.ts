@@ -27,6 +27,30 @@ export class UserRepository {
     return result;
   }
 
+  async findAllUserWithTasks() {
+    const results = await prisma.user.findMany({
+      include: { DailyTask: true },
+    });
+    return results;
+  }
+
+  async findUserWithTasksById(input: Prisma.UserWhereUniqueInput) {
+    const result = await prisma.user.findUnique({
+      where: { userId: input.userId },
+      include: { DailyTask: true },
+    });
+
+    return result;
+  }
+
+  async findUserWithTasksByWallet(input: Prisma.UserWhereUniqueInput) {
+    const result = await prisma.user.findUnique({
+      where: { walletAddress: input.walletAddress },
+      include: { DailyTask: true },
+    });
+    return result;
+  }
+
   async updateUser(
     input: Prisma.UserWhereUniqueInput,
     user: Prisma.UserUncheckedUpdateInput,
