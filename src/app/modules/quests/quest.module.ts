@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { QuestController } from './quest.controller';
-import { QuestRepository } from './quest.repository';
-import { QuestService } from './quest.service';
+import { QuestController } from './controllers/quest.controller';
+import { QuestRepository } from './repositories/quest.repository';
+import { QuestService } from './services/quest.service';
 
 @Module({
   controllers: [QuestController],

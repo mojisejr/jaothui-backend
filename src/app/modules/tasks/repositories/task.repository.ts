@@ -1,4 +1,4 @@
-import { prisma } from '../../../database/prisma';
+import { prisma } from '../../../../database/prisma';
 import { DailyTask, Prisma } from '@prisma/client';
 import { Injectable } from '@nestjs/common';
 

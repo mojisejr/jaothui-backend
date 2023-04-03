@@ -11,10 +11,10 @@ import {
 import { ResponseData } from 'src/shared/shared.interface';
 import { hasData } from 'src/utils/checkNullorUndefind';
 import { OkResponse } from 'src/utils/parseResponseData';
-import { CreateQuestDTO, UpdateQuestDTO } from './dto/quest.dto';
-import { QuestService } from './quest.service';
-import { UpdateQuestBodyValidationPipe } from './pipes/quest.update.pipe';
-import { CreateQuestBodyValidationPipe } from './pipes/quest.create.pipe';
+import { CreateQuestDTO, UpdateQuestDTO } from '../dto/quest.dto';
+import { QuestService } from '../services/quest.service';
+import { UpdateQuestBodyValidationPipe } from '../pipes/quest.update.pipe';
+import { CreateQuestBodyValidationPipe } from '../pipes/quest.create.pipe';
 
 @Controller('quests')
 export class QuestController {

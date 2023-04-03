@@ -11,15 +11,15 @@ import {
   ParseBoolPipe,
   BadRequestException,
 } from '@nestjs/common';
-import { TaskService } from './task.service';
+import { TaskService } from '../services/task.service';
 import { hasData } from 'src/utils/checkNullorUndefind';
 import { OkResponse } from 'src/utils/parseResponseData';
-import { CreateNewTaskDTO, UpdateTaskDTO } from './dto/task.dto';
+import { CreateNewTaskDTO, UpdateTaskDTO } from '../dto/task.dto';
 import { ResponseData } from 'src/shared/shared.interface';
-import { UserService } from '../users/user.service';
-import { QuestService } from '../quests/quest.service';
-import { CreateTaskBodyValidationPipe } from './pipes/task.create.pipe';
-import { UpdateTaskBodyValidationPipe } from './pipes/task.update.pipe';
+import { UserService } from '../../users/services/user.service';
+import { QuestService } from '../../quests/services/quest.service';
+import { CreateTaskBodyValidationPipe } from '../pipes/task.create.pipe';
+import { UpdateTaskBodyValidationPipe } from '../pipes/task.update.pipe';
 
 @Controller('tasks')
 export class TaskController {
@@ -37,6 +37,7 @@ export class TaskController {
     const quest = await this.questService.findQuestById(task.questId);
     const hasUser = hasData(user);
     const hasQuest = hasData(quest);
+
     if (hasUser && hasQuest) {
       const result = await this.taskService.createNewTask(task);
       return OkResponse(result, `create new task successfully`);

@@ -10,12 +10,12 @@ import {
   NotFoundException,
   ParseBoolPipe,
 } from '@nestjs/common';
-import { CreateUserDTO, UpdateUserDTO } from './dto/user.dto';
-import { UserService } from './user.service';
+import { CreateUserDTO, UpdateUserDTO } from '../dto/user.dto';
+import { UserService } from '../services/user.service';
 import { ResponseData } from 'src/shared/shared.interface';
 import { OkResponse } from 'src/utils/parseResponseData';
-import { CreateUserBodyValidationPipe } from './pipes/user.create.pipe';
-import { UpdateUserBodyValidationPipe } from './pipes/user.update.pipe';
+import { CreateUserBodyValidationPipe } from '../pipes/user.create.pipe';
+import { UpdateUserBodyValidationPipe } from '../pipes/user.update.pipe';
 import { EthAddressValidationPipe } from 'src/shared/pipes/address.validation';
 import { hasData } from 'src/utils/checkNullorUndefind';
 

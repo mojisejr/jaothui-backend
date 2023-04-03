@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TaskRepository } from './task.repository';
-import { TaskService } from './task.service';
-import { TaskController } from './task.controller';
-import { UserService } from '../users/user.service';
-import { QuestService } from '../quests/quest.service';
-import { UserRepository } from '../users/user.repository';
-import { QuestRepository } from '../quests/quest.repository';
+import { TaskRepository } from './repositories/task.repository';
+import { TaskService } from './services/task.service';
+import { TaskController } from './controllers/task.controller';
+import { UserService } from '../users/services/user.service';
+import { QuestService } from '../quests/services/quest.service';
+import { UserRepository } from '../users/repositories/user.repository';
+import { QuestRepository } from '../quests/repositories/quest.repository';
 
 @Module({
   controllers: [TaskController],

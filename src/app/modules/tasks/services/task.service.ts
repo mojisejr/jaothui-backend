@@ -1,5 +1,5 @@
-import { TaskRepository } from './task.repository';
-import { CreateNewTaskDTO, UpdateTaskDTO } from './dto/task.dto';
+import { TaskRepository } from '../repositories/task.repository';
+import { CreateNewTaskDTO, UpdateTaskDTO } from '../dto/task.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()

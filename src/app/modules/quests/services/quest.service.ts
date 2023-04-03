@@ -1,5 +1,5 @@
-import { CreateQuestDTO, UpdateQuestDTO } from './dto/quest.dto';
-import { QuestRepository } from './quest.repository';
+import { CreateQuestDTO, UpdateQuestDTO } from '../dto/quest.dto';
+import { QuestRepository } from '../repositories/quest.repository';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
