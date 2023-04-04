@@ -1,6 +1,14 @@
-import { IsNumber, IsBoolean, IsDate } from 'class-validator';
+import { IsNumber, IsBoolean, IsDate, IsOptional } from 'class-validator';
 
 export class CreateNewTaskDTO {
+  @IsNumber()
+  userId: number;
+
+  @IsNumber()
+  questId: number;
+}
+
+export class NewTask {
   @IsNumber()
   userId: number;
 
@@ -19,7 +27,8 @@ export class UpdateTaskDTO {
   pointEarned: number;
 
   @IsDate()
-  completedDate: Date;
+  @IsOptional()
+  completedDate?: Date;
 
   @IsBoolean()
   completed: boolean;

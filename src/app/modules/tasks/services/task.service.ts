@@ -1,12 +1,12 @@
 import { TaskRepository } from '../repositories/task.repository';
-import { CreateNewTaskDTO, UpdateTaskDTO } from '../dto/task.dto';
+import { NewTask, UpdateTaskDTO } from '../dto/task.dto';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
 export class TaskService {
   constructor(private taskRepo: TaskRepository) {}
 
-  async createNewTask(task: CreateNewTaskDTO) {
+  async createNewTask(task: NewTask) {
     try {
       const result = await this.taskRepo.createNewTask(task);
       return result;
@@ -100,6 +100,33 @@ export class TaskService {
     }
   }
 
+  async markTaskAsCompleted(taskId: number, point: number) {
+    try {
+      const markedTask = await this.taskRepo.updateOneTask(
+        { taskId },
+        {
+          pointEarned: point,
+          completed: true,
+          completed_date: new Date(),
+        },
+      );
+      return markedTask;
+    } catch (error) {
+      throw new BadRequestException(
+        `markTaskAsCompleted: mark taskId ${taskId} failed`,
+      );
+    }
+  }
+
+  async resetAllTasks() {
+    try {
+      const resetTasks = await this.taskRepo.resetAllTasks();
+      return resetTasks;
+    } catch (error) {
+      throw new BadRequestException(`resetAllTasks: reset tasks failed`);
+    }
+  }
+
   async deleteTaskByUserId(userId: number, taskId: number) {
     try {
       const deleted = await this.taskRepo.deleteTaskByUserId({
@@ -111,6 +138,26 @@ export class TaskService {
       throw new BadRequestException(
         `deleteTraskByUserId: deleting taskId ${taskId} of userId ${userId} failed`,
       );
+    }
+  }
+
+  async deleteTaskById(taskId: number) {
+    try {
+      const deleted = await this.taskRepo.deleteTaskById({ taskId });
+      return deleted;
+    } catch (error) {
+      throw new BadRequestException(
+        `deleteTraskByUserId: deleting taskId ${taskId}  failed`,
+      );
+    }
+  }
+
+  async checkCreatedTaskByUserId(userId: number, questId: number) {
+    try {
+      const tasks = await this.taskRepo.findManyTasks({ userId, questId });
+      return tasks.length > 0 ? true : false;
+    } catch (error) {
+      throw new BadRequestException(`checkCreatedTaskByUserId: failed`);
     }
   }
 }

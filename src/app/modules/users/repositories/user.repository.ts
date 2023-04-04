@@ -11,6 +11,13 @@ export class UserRepository {
   async findUserById(input: Prisma.UserWhereUniqueInput) {
     const result = await prisma.user.findUnique({
       where: { userId: input.userId },
+      include: {
+        DailyTask: {
+          include: { quest: true },
+        },
+        UserPoint: true,
+        RedemptionLog: true,
+      },
     });
     return result;
   }
@@ -29,7 +36,10 @@ export class UserRepository {
 
   async findAllUserWithTasks() {
     const results = await prisma.user.findMany({
-      include: { DailyTask: true },
+      include: {
+        DailyTask: { include: { quest: { select: { name: true } } } },
+        RedemptionLog: true,
+      },
     });
     return results;
   }
@@ -37,16 +47,27 @@ export class UserRepository {
   async findUserWithTasksById(input: Prisma.UserWhereUniqueInput) {
     const result = await prisma.user.findUnique({
       where: { userId: input.userId },
-      include: { DailyTask: true },
+      include: {
+        DailyTask: {
+          include: { quest: true },
+        },
+        RedemptionLog: true,
+        UserPoint: true,
+      },
     });
-
     return result;
   }
 
   async findUserWithTasksByWallet(input: Prisma.UserWhereUniqueInput) {
     const result = await prisma.user.findUnique({
       where: { walletAddress: input.walletAddress },
-      include: { DailyTask: true },
+      include: {
+        DailyTask: {
+          include: { quest: true },
+        },
+        RedemptionLog: true,
+        UserPoint: true,
+      },
     });
     return result;
   }

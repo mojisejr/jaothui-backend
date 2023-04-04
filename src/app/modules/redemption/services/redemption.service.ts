@@ -11,9 +11,11 @@ export class RedemptionService {
 
   async createNewRedemption(item: CreateRedemptionItemDTO) {
     try {
+      console.log('item', item);
       const created = await this.redemptionRepo.createNewRedemption(item);
       return created;
     } catch (error) {
+      console.log(error);
       throw new BadRequestException(
         `createNewRedemption: redemption creation error`,
       );
@@ -40,6 +42,17 @@ export class RedemptionService {
     }
   }
 
+  async findAllRedemptionAvailableItems() {
+    try {
+      const items = await this.redemptionRepo.findAllRedemptionAvailableItems();
+      return items;
+    } catch (error) {
+      throw new BadRequestException(
+        `findAllRedemptionAvailableItem: all available lookup error`,
+      );
+    }
+  }
+
   async findRedemptionItemById(itemId: number) {
     try {
       const item = await this.redemptionRepo.findRedemptionItemById({ itemId });
@@ -60,6 +73,20 @@ export class RedemptionService {
     } catch (error) {
       throw new BadRequestException(
         `findAllRedemptionLogsByUserId: userId ${userId} look up failed`,
+      );
+    }
+  }
+
+  async findRedemptionLogByUserId(userId: number, itemId: number) {
+    try {
+      const log = await this.redemptionRepo.findRedemptionLogByUserId({
+        userId,
+        itemId,
+      });
+      return log;
+    } catch (error) {
+      throw new BadRequestException(
+        `findRedemptionLogByUserId: userId ${userId} look up failed`,
       );
     }
   }

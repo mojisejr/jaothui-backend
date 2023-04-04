@@ -4,6 +4,7 @@ import {
   Post,
   Put,
   Body,
+  Delete,
   Param,
   ParseIntPipe,
   NotFoundException,
@@ -62,7 +63,7 @@ export class QuestController {
     return OkResponse(updated, `questId ${questId} updated successfully`);
   }
 
-  @Put('delete/:questId')
+  @Delete(':questId')
   async deleteQuestById(@Param('questId', ParseIntPipe) questId: number) {
     const deleted = await this.questService.deleteQuestById(questId);
     return OkResponse(deleted, `deleting questId ${questId} successfully`);

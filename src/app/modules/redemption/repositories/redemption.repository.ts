@@ -19,6 +19,14 @@ export class RedemptionRepository {
     return results;
   }
 
+  async findAllRedemptionAvailableItems() {
+    const results = await prisma.redemptionItem.findMany({
+      where: { available: true },
+    });
+
+    return results;
+  }
+
   async findRedemptionItemById(input: Prisma.RedemptionItemWhereUniqueInput) {
     const result = await prisma.redemptionItem.findUnique({
       where: { itemId: input.itemId },
@@ -26,11 +34,37 @@ export class RedemptionRepository {
     return result;
   }
 
+  async findRedemptionItemAvailableForId(
+    input: Prisma.RedemptionLogWhereInput,
+  ) {
+    const results = await prisma.redemptionItem.findMany({
+      include: {
+        RedemptionLog: true,
+      },
+    });
+
+    const r = results.map((r) => {
+      return r.RedemptionLog.filter((f) => f.userId == input.userId);
+    });
+
+    return r;
+  }
+
   async findAllRedemptionLogsByUserId(input: Prisma.RedemptionLogWhereInput) {
     const results = await prisma.redemptionLog.findMany({
       where: { userId: input.userId },
     });
     return results;
+  }
+
+  async findRedemptionLogByUserId(input: Prisma.RedemptionLogWhereInput) {
+    const result = await prisma.redemptionLog.findFirst({
+      where: {
+        userId: input.userId,
+        itemId: input.itemId,
+      },
+    });
+    return result;
   }
 
   async updateRedemptionItemById(

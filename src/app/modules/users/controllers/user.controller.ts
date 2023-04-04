@@ -9,19 +9,25 @@ import {
   ParseIntPipe,
   NotFoundException,
   ParseBoolPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { CreateUserDTO, UpdateUserDTO } from '../dto/user.dto';
 import { UserService } from '../services/user.service';
+import { UserPointService } from '../../userpoints/services/userpoints.service';
 import { ResponseData } from 'src/shared/shared.interface';
 import { OkResponse } from 'src/utils/parseResponseData';
 import { CreateUserBodyValidationPipe } from '../pipes/user.create.pipe';
 import { UpdateUserBodyValidationPipe } from '../pipes/user.update.pipe';
 import { EthAddressValidationPipe } from 'src/shared/pipes/address.validation';
 import { hasData } from 'src/utils/checkNullorUndefind';
+import { create } from 'domain';
 
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private userPointService: UserPointService,
+  ) {}
 
   @Get()
   async findAllUsers(
@@ -57,14 +63,25 @@ export class UserController {
   @Get(':userId')
   async findUserById(
     @Param('userId', ParseIntPipe) userId: number,
+    @Query('tasks', ParseBoolPipe) task: boolean,
   ): Promise<ResponseData> {
-    const user = await this.userService.findUserById(userId);
+    if (task) {
+      const user = await this.userService.findUserWithTasksById(userId);
 
-    if (!hasData(user)) {
-      throw new NotFoundException(`findUserById: ${userId} not found`);
+      if (!hasData(user)) {
+        throw new NotFoundException(`findUserById: ${userId} not found`);
+      }
+
+      return OkResponse(user, `get information of userId: ${userId}`);
+    } else {
+      const user = await this.userService.findUserById(userId);
+
+      if (!hasData(user)) {
+        throw new NotFoundException(`findUserById: ${userId} not found`);
+      }
+
+      return OkResponse(user, `get information of userId: ${userId}`);
     }
-
-    return OkResponse(user, `get information of userId: ${userId}`);
   }
 
   @Get('/wallet/:wallet')
@@ -95,6 +112,13 @@ export class UserController {
     @Body(CreateUserBodyValidationPipe) user: CreateUserDTO,
   ): Promise<ResponseData> {
     const created = await this.userService.createNewUser(user);
+
+    if (hasData(created)) {
+      //create user Point data
+      await this.userPointService.createUserPoint({
+        userId: created.userId,
+      });
+    }
 
     return OkResponse(created, `user created succesfully`, 201);
   }

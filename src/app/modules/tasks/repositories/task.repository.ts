@@ -62,6 +62,14 @@ export class TaskRepository {
     return tasks;
   }
 
+  async findManyTasks(input: Prisma.DailyTaskWhereInput) {
+    const tasks = await prisma.dailyTask.findMany({
+      where: input,
+    });
+
+    return tasks;
+  }
+
   async findAllCompletedTasksByUserId(
     input: Prisma.DailyTaskWhereInput,
   ): Promise<DailyTask[]> {
@@ -81,8 +89,28 @@ export class TaskRepository {
     data: Prisma.DailyTaskUncheckedUpdateInput,
   ) {
     const updated = await prisma.dailyTask.updateMany({
-      data,
+      data: { ...data, completed_date: new Date() },
       where: { userId: input.userId, taskId: input.taskId },
+    });
+    return updated;
+  }
+
+  async updateOneTask(
+    input: Prisma.DailyTaskWhereUniqueInput,
+    data: Prisma.DailyTaskUncheckedUpdateInput,
+  ) {
+    const updated = await prisma.dailyTask.update({
+      where: input,
+      data,
+    });
+    return updated;
+  }
+
+  async resetAllTasks() {
+    const updated = await prisma.dailyTask.updateMany({
+      data: {
+        completed: false,
+      },
     });
     return updated;
   }
@@ -90,6 +118,13 @@ export class TaskRepository {
   async deleteTaskByUserId(input: Prisma.DailyTaskWhereInput) {
     const deleted = await prisma.dailyTask.deleteMany({
       where: { userId: input.userId, taskId: input.taskId },
+    });
+    return deleted;
+  }
+
+  async deleteTaskById(input: Prisma.DailyTaskWhereUniqueInput) {
+    const deleted = await prisma.dailyTask.delete({
+      where: { taskId: input.taskId },
     });
     return deleted;
   }
